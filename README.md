@@ -21,9 +21,8 @@ always get a response even if one provider has an outage.
 ├── providers.tf            # AWS, Azure, GCP providers
 ├── versions.tf             # required_version + required_providers
 ├── locals.tf               # Naming convention (name_prefix, common_tags)
-├── checks.tf               # Check block: origin URLs non-empty for DNS
+├── backend.tf              # Bootstrap resources for remote state
 ├── terraform.tfvars
-├── Troubleshooting.md      # State lock and resource drift
 ├── modules/
 │   ├── aws-cdn/            # S3 + CloudFront (OAC)
 │   │   ├── main.tf
@@ -72,7 +71,12 @@ always get a response even if one provider has an outage.
    terraform apply
    ```
 
-3. Delegate your domain to the GCP zone name servers (see output
+   First apply uses local Terraform state. `backend.tf` creates S3 and
+   DynamoDB resources; it does not configure Terraform remote state.
+
+3. `terraform.tfvars` is a tracked example. Replace sample values with your own values, and never commit credentials or production secrets.
+
+4. Delegate your domain to the GCP zone name servers (see output
    `gcp_dns_zone_name_servers`).
 
 ## Practices in this repo
@@ -84,15 +88,17 @@ always get a response even if one provider has an outage.
 - **required_providers**, **locals** for naming and tags.
 - **Preconditions** in the GCP module so AWS and Azure origin URLs are
   non-empty before creating the health check and failover record.
-- **Check block** in the root module to ensure origin URLs are set after apply.
+- **State bootstrap:** S3 bucket and DynamoDB lock table for later remote state.
 
 ## Failover behavior
 
 - **Without** `gcp_dns_primary_target_ips` / `gcp_dns_backup_target_ips`: A
-  CNAME is created to the primary (CloudFront).
+  CNAME is created to the primary (CloudFront). This mode has no DNS health-check failover.
 - **With** both IP lists set: An A record with health-check steered
   primary/backup is created (primary = AWS IPs, backup = Azure IPs).
   CloudFront/Azure IPs can be resolved externally and passed in.
 
-See [Troubleshooting.md](Troubleshooting.md) for state lock and resource drift
-(e.g. S3 bucket manually deleted).
+The health check probes primary AWS origin only. Backup traffic begins when Google Cloud DNS marks primary endpoint unhealthy.
+
+After bootstrap, add an `s3` block under `terraform` in a separate backend
+configuration, then run `terraform init -migrate-state`.
