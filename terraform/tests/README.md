@@ -2,11 +2,11 @@
 
 ## What’s here
 
-- **`validate.sh`** – Runs `terraform init -backend=false` and `terraform validate`. No cloud credentials required. Run from repo root: `./tests/validate.sh`.
+- **`validate.sh`** – Runs `terraform init -backend=false` and `terraform validate`. No cloud credentials required. Run from the `terraform/` directory: `./tests/validate.sh`.
 
 ## CI
 
-Validation runs in GitHub Actions on push and pull requests (see `.github/workflows/terraform.yml`).
+Validation runs in GitHub Actions on push and pull requests (see `.github/workflows/terraform.yml` at the repo root).
 
 ## Going further
 

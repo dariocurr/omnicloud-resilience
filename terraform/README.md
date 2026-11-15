@@ -42,17 +42,15 @@ always get a response even if one provider has an outage.
 ├── tests/
 │   ├── validate.sh         # init + validate (no credentials)
 │   └── README.md
-├── .github/workflows/
-│   └── terraform.yml       # CI: validate on push/PR
 └── README.md
 ```
 
 ## Testing
 
-- **Local:** From the repo root run `./tests/validate.sh`
+- **Local:** From the `terraform/` directory run `./tests/validate.sh`
   (Terraform init + validate; no cloud credentials).
-- **CI:** GitHub Actions runs the same validate on push and pull requests to
-  `main`. See `tests/README.md` for more options (plan, Terratest).
+- **CI:** GitHub Actions (`.github/workflows/terraform.yml` at the repo root) runs the same
+  validate on push and pull requests to `main`. See `tests/README.md` for more options (plan, Terratest).
 
 ## Prerequisites
 
@@ -61,7 +59,7 @@ always get a response even if one provider has an outage.
 
 ## Quick start
 
-1. Set variables in `terraform.tfvars` (project_name, environment, regions, gcp_project_id, gcp_dns_domain, etc.).
+1. From the `terraform/` directory, set variables in `terraform.tfvars` (project_name, environment, regions, gcp_project_id, gcp_dns_domain, etc.).
 
 2. Plan and apply:
 

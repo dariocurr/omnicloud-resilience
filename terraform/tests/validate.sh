@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run from repo root: ./tests/validate.sh
+# Run from terraform/: ./tests/validate.sh
 # Requires Terraform >= 1.5. No cloud credentials needed for validate.
 
 set -e
