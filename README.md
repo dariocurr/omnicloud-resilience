@@ -2,9 +2,10 @@
 
 a comparative study of multi-cloud failover. the same architecture is built twice, once with terraform
 and once with pulumi: static content served from aws (s3 + cloudfront) as the primary origin, azure
-storage as the backup origin, and gcp cloud dns handling the routing between them. the point is to
-compare the two tools on the same job, covering reliability patterns such as failover, origin
-access control and explicit teardown ordering.
+storage as the backup origin, and gcp cloud dns in front of them. the point is to compare the two
+tools on the same job. they don't go equally far: the terraform version can steer traffic with a
+health-checked failover record, while the pulumi version only lays out separate primary and backup
+records and handles cloudfront teardown ordering explicitly.
 
 ## terraform
 
@@ -33,8 +34,8 @@ drawn from the two readmes and the code, not from measurements:
 | language | hcl | python |
 | structure | root module plus `modules/` | component resources under `components/` |
 | inputs | `variables.tf` and `terraform.tfvars` | `pulumi.Config()` and `Pulumi.dev.yaml` |
-| dns failover | health-check steered a record when ips are given, cname otherwise | primary and backup cname records (failover structure) |
-| state | local state first, s3 and dynamodb bootstrap in `backend.tf` | managed by the pulumi stack |
+| dns failover | health-check steered a record when ips are given, cname otherwise | separate `www` and `backup` cname records, no health check |
+| state | local state first, s3 and dynamodb bootstrap in `backend.tf` | pulumi stack state (no backend configured here) |
 | tests | `terraform validate` via `terraform/tests/validate.sh` | pytest on pure helpers |
 | ci | [terraform workflow](.github/workflows/terraform.yml) | [pulumi workflow](.github/workflows/pulumi.yml) |
 

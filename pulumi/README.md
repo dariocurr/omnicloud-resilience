@@ -73,7 +73,7 @@ This removes the stack’s resources in dependency order
 ## Run tests
 
 ```bash
-uv run pytest tests -v
+uv run --extra dev pytest tests -v
 ```
 
 ## Config (mandatory – Pulumi.dev.yaml / CLI)
